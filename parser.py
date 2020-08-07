@@ -45,11 +45,14 @@ class Parser():
       id = str(pupil[0])
       id = str(int(id)+1)
       if pupil[1][1] == self.username:
+        u_id = id
         line = '{0}. {1} - {2} баллов < Вы здесь\n'.format(id,pupil[1][1],pupil[1][0])
       else:
         line = '{0}. {1} - {2} баллов\n'.format(id,pupil[1][1],pupil[1][0])
       self.output += line
     self.output += '..'
+    if int(u_id) <= 60:
+      self.output += '\nПоздравляю! Вы попадаете в топ 60 учеников. У вас очень большие шансы поступить в МАШ! '
     print('%s served' % self.username)
   
   

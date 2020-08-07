@@ -39,9 +39,10 @@ def handle_bot(msg):
     if args[0] == '7' or args[0] == '8':
       try:
         if len(args[1]) == 4:
-          Parser = Parser(args[0],args[1])
+          Parser = Parser(args[0],args[1].lower())
           if Parser.parse_data():
             bot.sendMessage(chat_id, Parser.output)
+            time.sleep(1)
             bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
           else:
             bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
