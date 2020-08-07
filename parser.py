@@ -51,8 +51,6 @@ class Parser():
       self.output += line
     self.output += '..'
     print('%s served' % self.username)
-    
-    return True
   
   
   def parse_data(self):
@@ -71,7 +69,6 @@ class Parser():
           near_pos = range(user_pos-5,user_pos+5)
         else:
           difference = user_pos-1
-          print(type(user_pos))
           near_pos = range(difference,user_pos+5)
           
         for pos in near_pos:
@@ -81,6 +78,7 @@ class Parser():
       return False
     else:
       self.prettify_output()
+      return True
   
   
   def parse_html(self,link):
