@@ -77,7 +77,7 @@ class Parser():
         for pos in near_pos:
           self.near_rating.append(self.rating[pos])
           
-    if self.near_rating = []:
+    if self.near_rating == []:
       return False
     else:
       self.prettify_output()
