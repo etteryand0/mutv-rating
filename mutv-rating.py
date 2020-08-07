@@ -42,6 +42,7 @@ def handle_bot(msg):
           Parser = Parser(args[0],args[1])
           if Parser.parse_data():
             bot.sendMessage(chat_id, Parser.output)
+            bot.sendMessage(chat_id, 'Спаибо, что используете меня! Моц отец - etteryand0 (mutv в МАШ)\nСсылка на мой исходный код: https://github.com/etteryand0/mutv-rating')
           else:
             bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
         else:
