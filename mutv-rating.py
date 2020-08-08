@@ -29,28 +29,49 @@ def handle_bot(msg):
   help = '*[?]* Чтобы составить рейтинг, нам нужны следующие данные:\n  1) _Класс_\n  2) _Имя пользователя_\nПример использования: Отправить сообщение:\n  _8 mutv_'
   no_user = '*[-]* Я не смог найти такого ученика'
   content_type, chat_type, chat_id = telepot.glance(msg)
-  
+
   try:
     args = msg['text'].split()
   except KeyError:
     args = ['']
-  
+
   if content_type == 'text':
     if args[0] == '7' or args[0] == '8':
       try:
         if len(args[1]) == 4:
           Parser = Parser(args[0],args[1].lower())
-          if Parser.parse_data():
+
+          if Parser.parse_data(False):
             bot.sendMessage(chat_id, Parser.output)
             time.sleep(1)
             bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
-          else:
-            bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+        elif args[1] == 'all':
+          try:
+            if len(args[2]) == 4:
+              Parser = Parser(args[0],args[2].lower())
+                
+              if Parser.parse_data(True):
+                for rating in Parser.output:
+                  output = ''
+                  for pupil in rating:
+                    output += pupil+'\n'
+                  bot.sendMessage(chat_id, output)
+                  time.sleep(1)
+                
+                bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+              else:
+                bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+            else:
+              bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+          except IndexError:
+            bot.sendMessage(chat_id, help, parse_mode='Markdown')
         else:
           bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+      #else:
+        #bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
       except IndexError:
         bot.sendMessage(chat_id, help, parse_mode='Markdown')
-      
+
     elif args[0] == '10':
       bot.sendMessage(chat_id, '[-] Поддерживаются только 7 и 8 классы')
     else:

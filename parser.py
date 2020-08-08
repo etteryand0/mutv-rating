@@ -9,8 +9,7 @@
 #          МАШ          #
 # =============== # / / /
 # Всё авторство   #
-# принадлежит     # \ \ 
-# github.com/etteryand0/ #
+# принадлежит     # \ # github.com/etteryand0/ #
 #                        #
 # Ознакомьтесь с лицен-  #
 # зией перед использова- #
@@ -34,8 +33,8 @@ class Parser():
     self.output = ''
     link = 'http://arctic-school.com/exam7-8-results/exam-class%s/' % classroom # шаблон ссылки для парсинга
     self.parse_html(link)
-  
-  
+
+
   def prettify_output(self):
     # функция для оформления вывода
     # необходим для юзерфрендли статуса
@@ -56,13 +55,29 @@ class Parser():
     print('%s served' % self.username)
   
   
-  def parse_data(self):
+  def full_output(self):
+    # функция для вывода всего рейтинга
+    for pupil in self.rating:
+      id = str(pupil[0])
+      id = str(int(id)+1)
+      if pupil[1][1] == self.username:
+        u_id = id
+        line = '{0}. {1} - {2} баллов < Вы здесь\n'.format(id,pupil[1][1],pupil[1][0])
+      else:
+        line = '{0}. {1} - {2} баллов\n'.format(id,pupil[1][1],pupil[1][0])
+      self.output += line
+    output = self.output.split('\n')
+    self.output = [output[:50], output[:100][50:], output[:150][100:], output[:200][150:], output[200:]]
+    print('all output served by %s' % self.username)
+
+
+  def parse_data(self, state):
     # функция сортировки данных. Сортирует глобальный массив результатов по убыванию баллов.
     # находит данное имя пользователя, сохраняет его и 10 самых ближних по баллу учеников
     self.rating = sorted(self.rating) # сортировка начиная с 0
     self.rating = reversed(self.rating) # перевёртывает рейтинг в список по убыванию баллов
     self.rating = list(enumerate(self.rating)) # онумеровывает список
-    
+
 
     for pupil in self.rating:
       # (pos, [score,'username'])
@@ -73,24 +88,34 @@ class Parser():
         else:
           difference = user_pos-1
           near_pos = range(difference,user_pos+5)
-          
+
         for pos in near_pos:
           self.near_rating.append(self.rating[pos])
-          
+
     if self.near_rating == []:
       return False
     else:
-      self.prettify_output()
+      if state:
+        self.full_output()
+        with open('feedback.log','a') as f:
+          f.write('%s all output served\n' % self.username)
+      else:
+        self.prettify_output()
+      
+        # logging for feedback
+        with open('feedback.log','a') as f:
+          f.write('%s served\n' % self.username)
+      
       return True
-  
-  
+
+
   def parse_html(self,link):
     # функция парсинга html. по полученной ссылке отправляет GET запрос и находит в html таблицу.
     response = requests.get(link).text # GET запрос
     html = BeautifulSoup(response, 'html.parser') # форматированре в bs4
     table = html.find('table')
     trs = table.find_all('tr')[1:]
-    
+
     # искать в каждой строке данное имя пользователя,
     # попутно сохраняя баллы детей
     for tr in trs:
@@ -99,9 +124,8 @@ class Parser():
       score = int(tds[5].text)
       if int(score/10) == 0 and score != 0:
         score = '0' + str(score)
-      
+
       data = [str(score),tds[0].text] # summary,username
       self.rating.append(data)
-    
-    
+      
 
