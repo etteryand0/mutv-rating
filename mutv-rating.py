@@ -27,7 +27,7 @@ from parser import Parser # для парсинга рейтинга
 
 # Код, чтобы создать и очистить бд ban.db
 db_conn = sqlite3.connect('ban.db')
-db_cursor = bd_conn.cursor()
+db_cursor = db_conn.cursor()
 
 # Создать таблицу ban
 try:
@@ -66,13 +66,14 @@ def handle_bot(msg):
           db_curs = db_conn.cursor()
 
           try:
-            db_curs.execute('SELECT once FROM ban WHERE id=?',(args[1],))
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1])
           except:
-              time = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
-              db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, time))
-            db_curs.execute('SELECT once FROM ban WHERE id=?',(args[1],))
+            time = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
+            db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, time))
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1])
+            db_conn.commit()
           
-          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[0], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[0], '%H:%M:%S') ).seconds 
+          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[1], '%H:%M:%S') ).seconds 
 
           if time_diff < 120: # прошло 120 минут 
             bot.sendMessage(chat_id, banned % str(120-time_diff), parse_mod='Markdown')
