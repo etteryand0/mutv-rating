@@ -67,13 +67,14 @@ def handle_bot(msg):
 
           try:
             db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1])
+            print(db_curs.fetchone())
           except:
             time = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
             db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, time))
-            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1])
-            db_conn.commit()
-          
-          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[1], '%H:%M:%S') ).seconds 
+            db_curs.commit()
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1]
+
+          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[0], '%H:%M:%S') )
 
           if time_diff < 120: # прошло 120 минут 
             bot.sendMessage(chat_id, banned % str(120-time_diff), parse_mod='Markdown')
