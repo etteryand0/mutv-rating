@@ -26,37 +26,31 @@ import datetime # чтобы банить id по времени
 from parser import Parser # для парсинга рейтинга
 
 # Код, чтобы создать и очистить бд ban.db
-bd_conn = sqlite3.connect('ban.db')
-bd_cursor = bd_conn.cursor()
+db_conn = sqlite3.connect('ban.db')
+db_cursor = bd_conn.cursor()
 
 # Создать таблицу ban
-bd_cursor.execute('TRUNCATE TABLE ban')
-bd_cursor.execute('CREATE TABLE ban (name text, user text, full text)')
+try:
+  db_cursor.execute('CREATE TABLE ban (id text, once text, full text)')
+except:
+  db_cursor.execute('DROP TABLE ban')
+  db_cursor.execute('CREATE TABLE ban (id text, once text, full text)')
 
-print('База данных подключена')
-Parser = Parser('8','mutv').parse_data(False)
-rating8 = Parser.rating
-Parser = Parser('7','bgzf').parse_data(False)
-rating7 = Parser.rating
 
-for list_ in [rating8,rating7]:
-  for rate in list_:
-    time = datetime.datetime.now()
-    delta = datetime.timedelta(minutes=10)
-    bd_cursor.execute('INSERT INTO ban VALUES ("{1}","{0}","{0}")'.format(time - delta,rate[1][1]))
+db_conn.commit()
+db_conn.close()
   
 print('База данных настроена. Включаю бота')
 
 # функция для анализа сообщения
 def handle_bot(msg):
   from parser import Parser
+  import sqlite3
+
   help = '*[?]* Чтобы составить рейтинг, нам нужны следующие данные:\n  1) _Класс_\n  2) _Имя пользователя_\nПример использования: Отправить сообщение:\n  _8 mutv_'
   no_user = '*[-]* Я не смог найти такого ученика'
   content_type, chat_type, chat_id = telepot.glance(msg)
-
-  # TODO функция бана
-  with open('ban.db','r') as f:
-    ban = [i.strip() for i in f.readlines()]
+  banned = '*[-]* Вы пока что не можете использовать эту функцию. Действует ограничение.\n%s секунд осталось до разблокировки'
 
   try:
     args = msg['text'].split()
@@ -67,12 +61,26 @@ def handle_bot(msg):
     if args[0] == '7' or args[0] == '8':
       try:
         if len(args[1]) == 4:
-          Parser = Parser(args[0],args[1].lower())
+          # Parser = Parser(args[0],args[1].lower())
+          db_conn = sqlite3.connect('ban.db')
+          db_curs = db_conn.cursor()
 
-          if Parser.parse_data(False):
-            bot.sendMessage(chat_id, Parser.output)
-            time.sleep(1)
-            bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+          try:
+            db_curs.execute('SELECT once FROM ban WHERE id=?',(args[1],))
+          except:
+              time = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
+              db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, time))
+            db_curs.execute('SELECT once FROM ban WHERE id=?',(args[1],))
+          
+          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[0], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[0], '%H:%M:%S') ).seconds 
+
+          if time_diff < 120: # прошло 120 минут 
+            bot.sendMessage(chat_id, banned % str(120-time_diff), parse_mod='Markdown')
+          else:
+            if Parser.parse_data(False):
+              bot.sendMessage(chat_id, Parser.output)
+              time.sleep(1)
+              bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
