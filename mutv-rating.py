@@ -30,6 +30,10 @@ def handle_bot(msg):
   no_user = '*[-]* Я не смог найти такого ученика'
   content_type, chat_type, chat_id = telepot.glance(msg)
 
+  # TODO функция бана
+  with open('ban.db','r') as f:
+    ban = [i.strip() for i in f.readlines()]
+
   try:
     args = msg['text'].split()
   except KeyError:
