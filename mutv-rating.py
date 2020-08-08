@@ -10,7 +10,9 @@
 #    МАШ РС(Я)    #
 # =============== #
 # Всё авторство   #
-# принадлежит     # \ \ # github.com/etteryand0/ #
+# принадлежит \/  #
+# \/ \/ \/ \/ \/ \/ \ \ \
+# github.com/etteryand0/ #
 # Ознакомьтесь с лицен-  #
 # зией перед использова- #
 # нием, редактированием  #
@@ -61,28 +63,33 @@ def handle_bot(msg):
     if args[0] == '7' or args[0] == '8':
       try:
         if len(args[1]) == 4:
-          # Parser = Parser(args[0],args[1].lower())
           db_conn = sqlite3.connect('ban.db')
           db_curs = db_conn.cursor()
 
           try:
-            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1])
-            print(db_curs.fetchone())
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % bot_api)
+            fetch_time = db_curs.fetchone()[0]
           except:
-            time = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
-            db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, time))
-            db_curs.commit()
-            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % args[1]
+            dtime = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
+            db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, dtime))
+            db_conn.commit()
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % chat_id)
+            fetch_time = db_curs.fetchone()[0]
 
-          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(db_curs.fetchone()[0], '%H:%M:%S') )
+          time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
 
-          if time_diff < 120: # прошло 120 минут 
-            bot.sendMessage(chat_id, banned % str(120-time_diff), parse_mod='Markdown')
-          else:
+          if time_diff.seconds < 120: # не прошло 120 минут
+            bot.sendMessage(chat_id, banned % str(120-time_diff.seconds), parse_mode='Markdown')
+          else: # прошло 120 минут с бана. Парсим
+            Parser = Parser(args[0],args[1].lower())
             if Parser.parse_data(False):
               bot.sendMessage(chat_id, Parser.output)
               time.sleep(1)
               bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+              dtime = str(datetime.datetime.now()).split('.')[0].split(' ')[1]
+              db_curs.execute('UPDATE ban SET once="{0}" WHERE id="{1}"'.format(dtime,chat_id))
+              db_conn.commit()
+              db_conn.close()
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
@@ -105,8 +112,6 @@ def handle_bot(msg):
             bot.sendMessage(chat_id, help, parse_mode='Markdown')
         else:
           bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
-      #else:
-        #bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
       except IndexError:
         bot.sendMessage(chat_id, help, parse_mode='Markdown')
 
