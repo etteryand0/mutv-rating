@@ -21,7 +21,31 @@
 import time # чтобы спать
 import telepot # для работы с Telegram API
 from telepot.loop import MessageLoop
+import sqlite3 # работать с бд, чтобы банить id
+import datetime # чтобы банить id по времени
 from parser import Parser # для парсинга рейтинга
+
+# Код, чтобы создать и очистить бд ban.db
+bd_conn = sqlite3.connect('ban.db')
+bd_cursor = bd_conn.cursor()
+
+# Создать таблицу ban
+bd_cursor.execute('TRUNCATE TABLE ban')
+bd_cursor.execute('CREATE TABLE ban (name text, user text, full text)')
+
+print('База данных подключена')
+Parser = Parser('8','mutv').parse_data(False)
+rating8 = Parser.rating
+Parser = Parser('7','bgzf').parse_data(False)
+rating7 = Parser.rating
+
+for list_ in [rating8,rating7]:
+  for rate in list_:
+    time = datetime.datetime.now()
+    delta = datetime.timedelta(minutes=10)
+    bd_cursor.execute('INSERT INTO ban VALUES ("{1}","{0}","{0}")'.format(time - delta,rate[1][1]))
+  
+print('База данных настроена. Включаю бота')
 
 # функция для анализа сообщения
 def handle_bot(msg):
