@@ -79,6 +79,7 @@ def handle_bot(msg):
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
 
           if time_diff.seconds < 120: # не прошло 120 минут
+            time.sleep(1)
             bot.sendMessage(chat_id, banned % str(120-time_diff.seconds), parse_mode='Markdown')
           else: # прошло 120 минут с бана. Парсим
             Parser = Parser(args[0],args[1].lower())
@@ -109,15 +110,20 @@ def handle_bot(msg):
             else:
               bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
           except IndexError:
+            time.sleep(0.5)
             bot.sendMessage(chat_id, help, parse_mode='Markdown')
         else:
+          time.sleep(0.7)
           bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
       except IndexError:
+        time.sleep(1)
         bot.sendMessage(chat_id, help, parse_mode='Markdown')
 
     elif args[0] == '10':
+      time.sleep(1)
       bot.sendMessage(chat_id, '[-] Поддерживаются только 7 и 8 классы')
     else:
+      time.sleep(0.5)
       bot.sendMessage(chat_id, help, parse_mode='Markdown')
 
 # открыть файл с Telegram Bot Api и создать связь с ботом.
