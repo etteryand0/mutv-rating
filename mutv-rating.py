@@ -77,7 +77,7 @@ def handle_bot(msg):
             fetch_time = dtime
 
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
-          print(time_diff.seconds)
+          print(fetch_time, ', ', str(datetime.datetime.now()).split('.')[0].split(' ')[1],', ', time_diff.seconds)
 
           if time_diff.seconds < 120: # не прошло 120 минут
             time.sleep(1)
@@ -123,9 +123,9 @@ def handle_bot(msg):
                       output += pupil+'\n'
                     bot.sendMessage(chat_id, output)
                     time.sleep(1)
-                    bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
-                    db_curs.execute('UPDATE ban SET full="Y" WHERE id="{0}"'.format(chat_id))
-                    db_conn.commit()
+                  bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+                  db_curs.execute('UPDATE ban SET full="Y" WHERE id="{0}"'.format(chat_id))
+                  db_conn.commit()
                 else:
                   bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
               db_conn.close()
