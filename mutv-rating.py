@@ -75,6 +75,7 @@ def handle_bot(msg):
             db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id, dtime))
             db_conn.commit()
             fetch_time = dtime
+            print(fetch_time)
 
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
 
@@ -93,10 +94,10 @@ def handle_bot(msg):
             else:
               bot.sendMessage(chat_id, no_user, parse_mode="Markdown")
           db_conn.close()
+          print('db_conn closed()')
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
-              # Parser = Parser(args[0],args[2].lower())
               bot.sendMessage(chat_id, 'Пожалуйста, подождите! Обрабатываю...')
               db_conn = sqlite3.connect('ban.db')
               db_curs = db_conn.cursor()
@@ -114,6 +115,7 @@ def handle_bot(msg):
                   time.sleep(1)
                   bot.sendMessage(chat_id,"# Hey", parse_mode="Markdown")
               else:
+                Parser = Parser(args[0],args[2].lower())
                 if Parser.parse_data(True):
                   for rating in Parser.output:
                     output = ''
