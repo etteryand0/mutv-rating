@@ -68,7 +68,7 @@ def handle_bot(msg):
           db_curs = db_conn.cursor()
 
           try:
-            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % bot_api)
+            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % chat_id)
             fetch_time = db_curs.fetchone()[0]
             print('executed succesfuly')
           except:
