@@ -70,6 +70,7 @@ def handle_bot(msg):
           try:
             db_curs.execute('SELECT once FROM ban WHERE id="%s"' % bot_api)
             fetch_time = db_curs.fetchone()[0]
+            print('executed succesfuly')
           except:
             dtime = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
             db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id, dtime))
