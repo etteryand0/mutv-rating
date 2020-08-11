@@ -63,6 +63,7 @@ def handle_bot(msg):
     if args[0] == '7' or args[0] == '8':
       try:
         if len(args[1]) == 4:
+          bot.sendMessage(chat_id, 'Пожалуйста подождите! Обрабатываю...')
           db_conn = sqlite3.connect('ban.db')
           db_curs = db_conn.cursor()
 
@@ -89,11 +90,14 @@ def handle_bot(msg):
               dtime = str(datetime.datetime.now()).split('.')[0].split(' ')[1]
               db_curs.execute('UPDATE ban SET once="{0}" WHERE id="{1}"'.format(dtime,chat_id))
               db_conn.commit()
-              db_conn.close()
+            else:
+              bot.sendMessage(chat_id, no_user, parse_mode="Markdown")
+          db_conn.close()
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
               # Parser = Parser(args[0],args[2].lower())
+              bot.sendMessage(chat_id, 'Пожалуйста, подождите! Обрабатываю...')
               db_conn = sqlite3.connect('ban.db')
               db_curs = db_conn.cursor()
 
@@ -109,7 +113,6 @@ def handle_bot(msg):
               if fetch_status == 'Y':
                   time.sleep(1)
                   bot.sendMessage(chat_id,"# Hey", parse_mode="Markdown")
-                  time.sleep(1)
               else:
                 if Parser.parse_data(True):
                   for rating in Parser.output:
@@ -119,8 +122,11 @@ def handle_bot(msg):
                     bot.sendMessage(chat_id, output)
                     time.sleep(1)
                     bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+                    db.curs.execute('UPDATE ban SET full="Y" WHERE id="{0}"'.format(chat_id))
+                    db.conn.commit()
                 else:
                   bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+              db_conn.close()
             else:
               bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
           except IndexError:
