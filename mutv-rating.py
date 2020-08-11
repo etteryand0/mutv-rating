@@ -75,9 +75,9 @@ def handle_bot(msg):
             db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id, dtime))
             db_conn.commit()
             fetch_time = dtime
-            print(fetch_time)
 
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
+          print(time_diff.seconds)
 
           if time_diff.seconds < 120: # не прошло 120 минут
             time.sleep(1)
@@ -94,7 +94,6 @@ def handle_bot(msg):
             else:
               bot.sendMessage(chat_id, no_user, parse_mode="Markdown")
           db_conn.close()
-          print('db_conn closed()')
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
@@ -111,6 +110,7 @@ def handle_bot(msg):
                 db_conn.commit()
                 fetch_status = 'N'
               
+              print(fetch_status)
               if fetch_status == 'Y':
                   time.sleep(1)
                   bot.sendMessage(chat_id,"# Hey", parse_mode="Markdown")
@@ -124,8 +124,8 @@ def handle_bot(msg):
                     bot.sendMessage(chat_id, output)
                     time.sleep(1)
                     bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
-                    db.curs.execute('UPDATE ban SET full="Y" WHERE id="{0}"'.format(chat_id))
-                    db.conn.commit()
+                    db_curs.execute('UPDATE ban SET full="Y" WHERE id="{0}"'.format(chat_id))
+                    db_conn.commit()
                 else:
                   bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
               db_conn.close()
