@@ -71,10 +71,9 @@ def handle_bot(msg):
             fetch_time = db_curs.fetchone()[0]
           except:
             dtime = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
-            db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","{1}")'.format(chat_id, dtime))
+            db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id, dtime))
             db_conn.commit()
-            db_curs.execute('SELECT once FROM ban WHERE id="%s"' % chat_id)
-            fetch_time = db_curs.fetchone()[0]
+            fetch_time = dtime
 
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
 
@@ -94,19 +93,34 @@ def handle_bot(msg):
         elif args[1] == 'all':
           try:
             if len(args[2]) == 4:
-              Parser = Parser(args[0],args[2].lower())
-                
-              if Parser.parse_data(True):
-                for rating in Parser.output:
-                  output = ''
-                  for pupil in rating:
-                    output += pupil+'\n'
-                  bot.sendMessage(chat_id, output)
+              # Parser = Parser(args[0],args[2].lower())
+              db_conn = sqlite3.connect('ban.db')
+              db_curs = db_conn.cursor()
+
+              try:
+                db_curs.execute('SELECT full FROM ban WHERE id="{0}"'.format(chat_id))
+                fetch_status = db_curs.fetchone()[0]
+              except:
+                dtime = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
+                db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id,dtime))
+                db_conn.commit()
+                fetch_status = 'N'
+              
+              if fetch_status == 'Y':
                   time.sleep(1)
-                
-                bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+                  bot.sendMessage(chat_id,"# Hey", parse_mode="Markdown")
+                  time.sleep(1)
               else:
-                bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
+                if Parser.parse_data(True):
+                  for rating in Parser.output:
+                    output = ''
+                    for pupil in rating:
+                      output += pupil+'\n'
+                    bot.sendMessage(chat_id, output)
+                    time.sleep(1)
+                    bot.sendMessage(chat_id, 'Спасибо, что используете меня! Мой отец - etteryand0 (mutv в МАШ)\n\nПодробнее о mutv Rating вы можете узнать по этой ссылке: https://github.com/etteryand0/mutv-rating')
+                else:
+                  bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
             else:
               bot.sendMessage(chat_id, no_user, parse_mode='Markdown')
           except IndexError:
