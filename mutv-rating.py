@@ -70,7 +70,6 @@ def handle_bot(msg):
           try:
             db_curs.execute('SELECT once FROM ban WHERE id="%s"' % chat_id)
             fetch_time = db_curs.fetchone()[0]
-            print('executed succesfuly')
           except:
             dtime = str(datetime.datetime.now() - datetime.timedelta(minutes = 10)).split('.')[0].split(' ')[1]
             db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id, dtime))
@@ -78,7 +77,6 @@ def handle_bot(msg):
             fetch_time = dtime
 
           time_diff = (datetime.datetime.strptime(str(datetime.datetime.now()).split('.')[0].split(' ')[1], '%H:%M:%S') -  datetime.datetime.strptime(fetch_time, '%H:%M:%S') )
-          print(fetch_time, ', ', str(datetime.datetime.now()).split('.')[0].split(' ')[1],', ', time_diff.seconds)
 
           if time_diff.seconds < 120: # не прошло 120 минут
             time.sleep(1)
@@ -110,11 +108,10 @@ def handle_bot(msg):
                 db_curs.execute('INSERT INTO ban VALUES ("{0}","{1}","N")'.format(chat_id,dtime))
                 db_conn.commit()
                 fetch_status = 'N'
-              
-              print(fetch_status)
+               
               if fetch_status == 'Y':
                   time.sleep(1)
-                  bot.sendMessage(chat_id,"# Hey", parse_mode="Markdown")
+                  bot.sendMessage(chat_id,"*[-]* Вы пока уже не можете использовать эту функцию. Она будет доступна при следующем запуске бота", parse_mode="Markdown")
               else:
                 Parser = Parser(args[0],args[2].lower())
                 if Parser.parse_data(True):
